@@ -12,7 +12,7 @@ use spl_tlv_account_resolution::{
 };
 use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 
-declare_id!("YDao1FevSHaCrn1ZoCVSugKh2RTQYKiDocwaM5Pbtkw");
+declare_id!("BVfCyy9BvUqLA3BHgBEK8SqZwLnvzraeAsEextE63Ngk");
 
 #[program]
 pub mod transfer_hook_whale {

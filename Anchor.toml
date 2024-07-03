@@ -6,17 +6,17 @@ resolution = false
 skip-lint = false
 
 [programs.localnet]
-transfer_hook_whale = "YDao1FevSHaCrn1ZoCVSugKh2RTQYKiDocwaM5Pbtkw"
+transfer_hook_whale = "BVfCyy9BvUqLA3BHgBEK8SqZwLnvzraeAsEextE63Ngk"
 
 [programs.devnet]
-transfer_hook_whale = "YDao1FevSHaCrn1ZoCVSugKh2RTQYKiDocwaM5Pbtkw"
+transfer_hook_whale = "BVfCyy9BvUqLA3BHgBEK8SqZwLnvzraeAsEextE63Ngk"
 
 [registry]
-url = "https://api.apr.dev"
+url = "http://127.0.0.1:8899"
 
 [provider]
-cluster = "devnet"
-wallet = "~/.config/solana/id.json"
+cluster = "localnet"
+wallet = "~/.config/solana/id_user1.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
