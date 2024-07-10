@@ -72,6 +72,8 @@ pub mod transfer_hook_whale {
         msg!(&format!("Transfer hook fired for an amount of {}", amount));
 
         if amount >= 1000 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
+            return Err(error!(MyError::Hello));
+            /*
             // we have a whale!
             ctx.accounts.latest_whale_account.whale_address = ctx.accounts.owner.key();
             ctx.accounts.latest_whale_account.transfer_amount = amount;
@@ -80,6 +82,7 @@ pub mod transfer_hook_whale {
                 whale_address: ctx.accounts.owner.key(),
                 transfer_amount: amount
             });
+            */
         }
 
         Ok(())
@@ -152,4 +155,10 @@ pub struct WhaleAccount {
 pub struct WhaleTransferEvent {
     pub whale_address: Pubkey,
     pub transfer_amount: u64,
+}
+
+#[error_code]
+pub enum MyError {
+    #[msg("This is an error message clients will automatically display")]
+    Hello,
 }
