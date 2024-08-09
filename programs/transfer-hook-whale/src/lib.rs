@@ -72,9 +72,13 @@ pub mod transfer_hook_whale {
         msg!(&format!("Transfer hook fired for an amount of {}", amount));
 
         if amount >= 1000 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
+            msg!(&format!("Transfer hook fired for an amount more than 1000 {}", amount));
             return Err(error!(MyError::Hello));
-            /*
+        }
+
+        if amount >= 500 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
             // we have a whale!
+            msg!(&format!("Transfer hook fired for an amount more than 500 {}", amount));
             ctx.accounts.latest_whale_account.whale_address = ctx.accounts.owner.key();
             ctx.accounts.latest_whale_account.transfer_amount = amount;
 
@@ -82,9 +86,7 @@ pub mod transfer_hook_whale {
                 whale_address: ctx.accounts.owner.key(),
                 transfer_amount: amount
             });
-            */
         }
-
         Ok(())
     }
 
