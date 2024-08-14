@@ -11,6 +11,8 @@ use spl_tlv_account_resolution::{
     account::ExtraAccountMeta, seeds::Seed, state::ExtraAccountMetaList,
 };
 use spl_transfer_hook_interface::instruction::ExecuteInstruction;
+use mpl_token_metadata::state::Metadata;
+use anchor_lang::solana_program::program_pack::Pack;
 
 declare_id!("BVfCyy9BvUqLA3BHgBEK8SqZwLnvzraeAsEextE63Ngk");
 
@@ -71,9 +73,9 @@ pub mod transfer_hook_whale {
     pub fn transfer_hook(ctx: Context<TransferHook>, amount: u64) -> Result<()> {
         msg!(&format!("Transfer hook fired for an amount of {}", amount));
 
+        /*
         if amount >= 1000 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
             return Err(error!(MyError::Hello));
-            /*
             // we have a whale!
             ctx.accounts.latest_whale_account.whale_address = ctx.accounts.owner.key();
             ctx.accounts.latest_whale_account.transfer_amount = amount;
@@ -82,9 +84,10 @@ pub mod transfer_hook_whale {
                 whale_address: ctx.accounts.owner.key(),
                 transfer_amount: amount
             });
-            */
         }
-
+        */
+        metadata_helper_module::get_metadata(ctx.accounts.mint);
+        msg!(&format!("metadata_helper_module::get_metadata info is found succesfuly"));
         Ok(())
     }
 
@@ -106,6 +109,33 @@ pub mod transfer_hook_whale {
             }
             _ => return Err(ProgramError::InvalidInstructionData.into()),
         }
+    }
+
+}
+
+// Declaring another module
+mod metadata_helper_module {
+    use super::*;
+
+    pub fn get_metadata(mint: &Pubkey) -> Result<()> {
+        msg!("get_metadata mint : {}", mint);
+        let metadata_account_info = derive_metadata_pda(mint);
+        // Deserialize the metadata account data
+        let metadata: Metadata = Metadata::deserialize(&mut &**metadata_account_info.try_borrow_data()?)?;
+        // Log or use the metadata fields
+        msg!("Name: {}", metadata.data.name);
+        msg!("Symbol: {}", metadata.data.symbol);
+        msg!("URI: {}", metadata.data.uri);
+        Ok(())
+    }
+
+    pub fn derive_metadata_pda(mint: &Pubkey) -> Pubkey {
+        let seeds = &[
+            b"metadata",
+            &mpl_token_metadata::ID.to_bytes(),
+            &mint.to_bytes(),
+        ];
+        Pubkey::find_program_address(seeds, &mpl_token_metadata::ID).0
     }
 }
 
