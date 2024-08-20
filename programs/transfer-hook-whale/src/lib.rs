@@ -71,9 +71,10 @@ pub mod transfer_hook_whale {
     pub fn transfer_hook(ctx: Context<TransferHook>, amount: u64) -> Result<()> {
         msg!(&format!("Transfer hook fired for an amount of {}", amount));
 
+        /*
         if amount >= 1000 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
             return Err(error!(MyError::Hello));
-            /*
+            
             // we have a whale!
             ctx.accounts.latest_whale_account.whale_address = ctx.accounts.owner.key();
             ctx.accounts.latest_whale_account.transfer_amount = amount;
@@ -82,8 +83,30 @@ pub mod transfer_hook_whale {
                 whale_address: ctx.accounts.owner.key(),
                 transfer_amount: amount
             });
-            */
+            
         }
+        */
+
+        // Static seed: "user-token-account"
+        let static_seed = b"user-token-account";
+
+        // Dynamic seed: the source token account public key
+        let source_token_key = ctx.accounts.source_token.key();
+
+        // Derive the PDA using both the static seed and dynamic seed
+        let (pda_source_token_account, _bump) = Pubkey::find_program_address(&[static_seed, source_token_key.as_ref()], ctx.program_id);
+
+        // Log the PDA for debugging purposes
+        msg!("PDA source_token_account: {}", pda_source_token_account);
+
+        // Check if the PDA account already exists
+        if ctx.accounts.pda_source_token_account.get_lamports() > 0 {
+            return Err(MyError::AccountAlreadyInUse.into());
+        } else {
+            
+
+        }
+
 
         Ok(())
     }
@@ -143,6 +166,19 @@ pub struct TransferHook<'info> {
     pub extra_account_meta_list: UncheckedAccount<'info>,
     #[account(mut, seeds=[b"whale_account"], bump)]
     pub latest_whale_account: Account<'info, WhaleAccount>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
+    #[account(init, seeds = [b"user-token-account", source_token.key().as_ref()], bump, payer=payer, space=8+32+8)]
+    pub pda_source_token_account: Account<'info, MyTokenAccountPDAData>,
+    #[account(init, seeds = [b"user-token-account", destination_token.key().as_ref()], bump, payer=payer, space=8+32+8)]
+    pub pda_destination_token_account: Account<'info, MyTokenAccountPDAData>,
+    pub system_program: Program<'info, System>,
+}
+
+#[account]
+pub struct MyTokenAccountPDAData {
+    // Store key-value pairs as a vector of tuples (key, value)
+    pub key_value_pairs: Vec<(String, String)>,
 }
 
 #[account]
@@ -161,4 +197,6 @@ pub struct WhaleTransferEvent {
 pub enum MyError {
     #[msg("This is an error message clients will automatically display")]
     Hello,
+    #[msg("This account already exist.")]
+    AccountAlreadyInUse,
 }
