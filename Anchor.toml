@@ -6,10 +6,10 @@ resolution = false
 skip-lint = false
 
 [programs.localnet]
-transfer_hook_whale = "BVfCyy9BvUqLA3BHgBEK8SqZwLnvzraeAsEextE63Ngk"
+transfer_hook_whale = "4rAinAZsmDoUYkWb91ciap5HLivbRZRAjRWdw8QFcVC6"
 
 [programs.devnet]
-transfer_hook_whale = "BVfCyy9BvUqLA3BHgBEK8SqZwLnvzraeAsEextE63Ngk"
+transfer_hook_whale = "4rAinAZsmDoUYkWb91ciap5HLivbRZRAjRWdw8QFcVC6"
 
 [registry]
 url = "http://127.0.0.1:8899"

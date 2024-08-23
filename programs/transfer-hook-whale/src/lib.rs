@@ -12,7 +12,7 @@ use spl_tlv_account_resolution::{
 };
 use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 
-declare_id!("BVfCyy9BvUqLA3BHgBEK8SqZwLnvzraeAsEextE63Ngk");
+declare_id!("4rAinAZsmDoUYkWb91ciap5HLivbRZRAjRWdw8QFcVC6");
 
 #[program]
 pub mod transfer_hook_whale {
@@ -87,27 +87,47 @@ pub mod transfer_hook_whale {
         }
         */
 
+        // Calculate the account size and the rent
+        let account_size = 1024;
+        let lamports = Rent::get()?.minimum_balance(account_size as usize);
+
         // Static seed: "user-token-account"
         let static_seed = b"user-token-account";
 
         // Dynamic seed: the source token account public key
         let source_token_key = ctx.accounts.source_token.key();
 
+        // The seeds for the ExtraAccountMetaList PDA.
+        let signer_seeds: &[&[&[u8]]] = &[&[
+            static_seed,
+            &source_token_key.as_ref(),
+        ]];
+
         // Derive the PDA using both the static seed and dynamic seed
-        let (pda_source_token_account, _bump) = Pubkey::find_program_address(&[static_seed, source_token_key.as_ref()], ctx.program_id);
+        //let (pda_source_token_account, _bump) = Pubkey::find_program_address(&[static_seed, source_token_key.as_ref()], ctx.program_id);
 
         // Log the PDA for debugging purposes
-        msg!("PDA source_token_account: {}", pda_source_token_account);
+        msg!("PDA source_token_account: {}", ctx.accounts.pda_source_token_account.key());
 
         // Check if the PDA account already exists
         if ctx.accounts.pda_source_token_account.get_lamports() > 0 {
             return Err(MyError::AccountAlreadyInUse.into());
         } else {
-            
-
+            // Create the ExtraAccountMetaList account
+        create_account(
+            CpiContext::new(
+                ctx.accounts.system_program.to_account_info(),
+                CreateAccount {
+                    from: ctx.accounts.payer.to_account_info(),
+                    to: ctx.accounts.pda_source_token_account.to_account_info(),
+                },
+            )
+            .with_signer(signer_seeds),
+            lamports,
+            account_size,
+            ctx.program_id,
+        )?;
         }
-
-
         Ok(())
     }
 
