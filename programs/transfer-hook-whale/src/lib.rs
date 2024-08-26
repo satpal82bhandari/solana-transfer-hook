@@ -11,8 +11,12 @@ use spl_tlv_account_resolution::{
     account::ExtraAccountMeta, seeds::Seed, state::ExtraAccountMetaList,
 };
 use spl_transfer_hook_interface::instruction::ExecuteInstruction;
+use std::collections::BTreeMap;
+use borsh::{BorshDeserialize, BorshSerialize};
+use anchor_lang::solana_program::program_pack::{IsInitialized, Pack, Sealed};
 
-declare_id!("BVfCyy9BvUqLA3BHgBEK8SqZwLnvzraeAsEextE63Ngk");
+
+declare_id!("BJgyiXeQgkdCKDK7BbqKGYLUN7MWw7UzZCRonWRCGwyJ");
 
 #[program]
 pub mod transfer_hook_whale {
@@ -65,12 +69,28 @@ pub mod transfer_hook_whale {
             &account_metas,
         )?;
 
+        //let whale_pda = &mut ctx.accounts.latest_whale_account;
+        let mut whale_account_data = WhaleAccount::try_from_slice(&ctx.accounts.latest_whale_account.data.borrow())?;
+
+        whale_account_data.data_map = BTreeMap::new();
+        whale_account_data.data_map.serialize(&mut &mut ctx.accounts.latest_whale_account.data.borrow_mut()[..])?;
+
+
         Ok(())
     }
 
     pub fn transfer_hook(ctx: Context<TransferHook>, amount: u64) -> Result<()> {
         msg!(&format!("Transfer hook fired for an amount of {}", amount));
 
+
+        //let src_pub_key = ctx.accounts.latest_whale_account.map.get(&ctx.accounts.source_token.key());
+
+        let mut whale_account_data = WhaleAccount::try_from_slice(&ctx.accounts.latest_whale_account.data.borrow())?;
+
+
+        whale_account_data.data_map.insert(ctx.accounts.source_token.key(),  ctx.accounts.source_token.key());
+        
+        /* 
         if amount >= 1000 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
             return Err(error!(MyError::Hello));
             /*
@@ -84,6 +104,7 @@ pub mod transfer_hook_whale {
             });
             */
         }
+        */
 
         Ok(())
     }
@@ -117,8 +138,15 @@ pub struct InitializeExtraAccountMeta<'info> {
     #[account(mut, seeds=[b"extra-account-metas", mint.key().as_ref()], bump)]
     pub extra_account_meta_list: AccountInfo<'info>,
     pub mint: InterfaceAccount<'info, Mint>,
-    #[account(init, seeds=[b"whale_account"], bump, payer=payer, space=8+32+8)]
-    pub latest_whale_account: Account<'info, WhaleAccount>,
+    #[account(
+        init,
+        seeds = [b"whale_account"], // Define PDA seeds
+        bump, // Automatically calculate the bump
+        payer = payer, // Specify who pays for the account creation
+        space = 8 + WhaleAccount::space(), // Calculate space required
+    )]
+    //#[account(init, seeds=[b"whale_account"], bump, payer=payer, space=8+256+8)]
+    pub latest_whale_account: AccountInfo<'info>,
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
@@ -142,20 +170,67 @@ pub struct TransferHook<'info> {
     #[account(seeds = [b"extra-account-metas", mint.key().as_ref()],bump)]
     pub extra_account_meta_list: UncheckedAccount<'info>,
     #[account(mut, seeds=[b"whale_account"], bump)]
-    pub latest_whale_account: Account<'info, WhaleAccount>,
+    pub latest_whale_account: AccountInfo<'info>
 }
 
-#[account]
+//#[account]
+#[derive(Default, BorshSerialize, BorshDeserialize)]
 pub struct WhaleAccount {
-    pub whale_address: Pubkey,
-    pub transfer_amount: u64,
+    //pub whale_address: Pubkey,
+    //pub transfer_amount: u64,
+    pub data_map: BTreeMap<Pubkey, Pubkey>,
 }
 
+impl WhaleAccount {
+
+    pub fn space() -> usize {
+        8 +  // Account discriminator
+        4 + (32 + 32) * 100 // Adjust size based on expected entries
+    }
+
+
+    pub fn insert(&mut self, key: Pubkey, value: Pubkey) {
+        self.data_map.insert(key, value);
+    }
+
+    pub fn get(&self, key: &Pubkey) -> Option<&Pubkey> {
+        self.data_map.get(key)
+    }
+    
+    pub fn remove(&mut self, key: &Pubkey) {
+        self.data_map.remove(key);
+    }
+}
+
+/*
+impl BorshSerialize for WhaleAccount {
+    fn serialize<W: std::io::Write>(&self, writer: &mut W) -> std::io::Result<()> {
+        let map_vec: Vec<(Pubkey, Pubkey)> = self.data_map.iter().map(|(k, v)| (*k, *v)).collect();
+        map_vec.serialize(writer)
+    }
+}
+
+impl BorshDeserialize for WhaleAccount {
+    fn deserialize(buf: &mut &[u8]) -> std::io::Result<Self> {
+        let map_vec: Vec<(Pubkey, Pubkey)> = BorshDeserialize::deserialize(buf)?;
+        let data_map: BTreeMap<Pubkey, Pubkey> = map_vec.into_iter().collect();
+        Ok(Self { data_map })
+    }
+    
+    fn deserialize_reader<R: std::io::Read>(reader: &mut R) -> std::io::Result<Self> {
+        todo!()
+    }
+}
+ */
+
+/*
 #[event]
 pub struct WhaleTransferEvent {
     pub whale_address: Pubkey,
     pub transfer_amount: u64,
 }
+*/
+
 
 #[error_code]
 pub enum MyError {
