@@ -18,6 +18,8 @@ idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 
 [dependencies]
 anchor-lang = "0.30.0"
-anchor-spl = "0.30.0"
+#anchor-spl = "0.30.0"
+anchor-spl = { version = "0.30.0", features = ["metadata"] }
+
 spl-tlv-account-resolution = "0.6.3"
 spl-transfer-hook-interface = "0.6.3"

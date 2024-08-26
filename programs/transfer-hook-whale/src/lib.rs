@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_lang::AnchorSerialize;
 use anchor_lang::system_program::{create_account, CreateAccount};
 use anchor_spl::token_interface::TokenAccount;
 use anchor_spl::{
@@ -12,7 +13,7 @@ use spl_tlv_account_resolution::{
 };
 use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 
-declare_id!("BVfCyy9BvUqLA3BHgBEK8SqZwLnvzraeAsEextE63Ngk");
+declare_id!("HNAKhrYRMsFftBSBMzaLZ3EeJEBMj9zKhuPAd4YQsmct");
 
 #[program]
 pub mod transfer_hook_whale {
@@ -69,22 +70,32 @@ pub mod transfer_hook_whale {
     }
 
     pub fn transfer_hook(ctx: Context<TransferHook>, amount: u64) -> Result<()> {
+
+         let inner_struct: NewWhaleAccount = NewWhaleAccount {
+            name: String::from("Ankur"),
+            age: 30,
+        };
+        msg!(&format!("whale account amount : {:?}", ctx.accounts.latest_whale_account.user_info ));
         msg!(&format!("Transfer hook fired for an amount of {}", amount));
+        // msg!(&format!("source token account : {:?}", ctx.accounts.source_token));
 
-        if amount >= 1000 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
-            return Err(error!(MyError::Hello));
-            /*
-            // we have a whale!
-            ctx.accounts.latest_whale_account.whale_address = ctx.accounts.owner.key();
-            ctx.accounts.latest_whale_account.transfer_amount = amount;
 
-            emit!(WhaleTransferEvent {
-                whale_address: ctx.accounts.owner.key(),
-                transfer_amount: amount
-            });
-            */
-        }
+        ctx.accounts.latest_whale_account.whale_address = ctx.accounts.source_token.key();
+        ctx.accounts.latest_whale_account.user_info = inner_struct;
+        msg!(&format!("whale account address: {}", ctx.accounts.latest_whale_account.key()));
+        
 
+        // if amount >= 10 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
+        //     // we have a whale!
+        //     ctx.accounts.latest_whale_account.whale_address = ctx.accounts.source_token.key();
+        //     ctx.accounts.latest_whale_account.transfer_amount = amount;
+        //     msg!(&format!("whale account address {}", ctx.accounts.latest_whale_account.key()));
+
+        //     emit!(WhaleTransferEvent {
+        //         whale_address: ctx.owner.key(),
+        //         transfer_amount: amount,
+        //     });
+        // }
         Ok(())
     }
 
@@ -117,7 +128,7 @@ pub struct InitializeExtraAccountMeta<'info> {
     #[account(mut, seeds=[b"extra-account-metas", mint.key().as_ref()], bump)]
     pub extra_account_meta_list: AccountInfo<'info>,
     pub mint: InterfaceAccount<'info, Mint>,
-    #[account(init, seeds=[b"whale_account"], bump, payer=payer, space=8+32+8)]
+    #[account(init, seeds=[b"whale_account"], bump, payer=payer, space=8+1024+8)]
     pub latest_whale_account: Account<'info, WhaleAccount>,
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -145,11 +156,21 @@ pub struct TransferHook<'info> {
     pub latest_whale_account: Account<'info, WhaleAccount>,
 }
 
+
 #[account]
+
 pub struct WhaleAccount {
     pub whale_address: Pubkey,
-    pub transfer_amount: u64,
+    pub user_info: NewWhaleAccount,
 }
+
+#[derive(AnchorSerialize, AnchorDeserialize,Clone)]
+#[derive(Debug)]
+pub struct NewWhaleAccount {
+    pub name: String,
+    pub age: u32,
+}
+
 
 #[event]
 pub struct WhaleTransferEvent {
@@ -157,8 +178,3 @@ pub struct WhaleTransferEvent {
     pub transfer_amount: u64,
 }
 
-#[error_code]
-pub enum MyError {
-    #[msg("This is an error message clients will automatically display")]
-    Hello,
-}
