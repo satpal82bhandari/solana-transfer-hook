@@ -5,17 +5,19 @@ anchor_version = "0.30.0"
 resolution = false
 skip-lint = false
 
-[programs.localnet]
-transfer_hook_whale = "HNAKhrYRMsFftBSBMzaLZ3EeJEBMj9zKhuPAd4YQsmct"
-
 [programs.devnet]
+transfer_hook_whale = "HNAKhrYRMsFftBSBMzaLZ3EeJEBMj9zKhuPAd4YQsmct"
+transfer_hook_rule_engine = "7Gw2aqAHjxw5QuhwVhLnRMtuPuwcxPktSu7YFteE2PCq"
+
+[programs.localnet]
+transfer_hook_rule_engine = "7Gw2aqAHjxw5QuhwVhLnRMtuPuwcxPktSu7YFteE2PCq"
 transfer_hook_whale = "HNAKhrYRMsFftBSBMzaLZ3EeJEBMj9zKhuPAd4YQsmct"
 
 [registry]
 url = "https://api.devnet.solana.com"
 
 [provider]
-cluster = "localnet"
+cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

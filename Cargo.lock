@@ -2431,6 +2431,15 @@ dependencies = [
  "anchor-spl",
  "spl-tlv-account-resolution",
  "spl-transfer-hook-interface",
+ "transfer_hook_rule_engine",
+]
+
+[[package]]
+name = "transfer_hook_rule_engine"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
 ]
 
 [[package]]

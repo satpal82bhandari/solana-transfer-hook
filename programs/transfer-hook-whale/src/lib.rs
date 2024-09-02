@@ -8,10 +8,19 @@ use anchor_spl::{
 };
 use spl_transfer_hook_interface::instruction::TransferHookInstruction;
 
+
 use spl_tlv_account_resolution::{
     account::ExtraAccountMeta, seeds::Seed, state::ExtraAccountMetaList,
 };
+
 use spl_transfer_hook_interface::instruction::ExecuteInstruction;
+
+use transfer_hook_rule_engine::program::TransferHookRuleEngine;
+
+use transfer_hook_rule_engine::{self, PDAAccount};
+
+use transfer_hook_rule_engine::cpi::accounts::Get;
+
 
 declare_id!("HNAKhrYRMsFftBSBMzaLZ3EeJEBMj9zKhuPAd4YQsmct");
 
@@ -71,20 +80,22 @@ pub mod transfer_hook_whale {
 
     pub fn transfer_hook(ctx: Context<TransferHook>, amount: u64) -> Result<()> {
 
-         let inner_struct: NewWhaleAccount = NewWhaleAccount {
-            name: String::from("Ankur"),
-            age: 30,
-        };
-        msg!(&format!("whale account amount : {:?}", ctx.accounts.latest_whale_account.user_info ));
         msg!(&format!("Transfer hook fired for an amount of {}", amount));
         // msg!(&format!("source token account : {:?}", ctx.accounts.source_token));
 
 
         ctx.accounts.latest_whale_account.whale_address = ctx.accounts.source_token.key();
-        ctx.accounts.latest_whale_account.user_info = inner_struct;
-        msg!(&format!("whale account address: {}", ctx.accounts.latest_whale_account.key()));
+        //ctx.accounts.latest_whale_account.user_info = inner_struct;
+        //msg!(&format!("whale account address: {}", ctx.accounts.latest_whale_account.key()));
         
 
+        let cpi_program = ctx.accounts.transfer_hook_rule_engine_program.to_account_info();
+        let cpi_accounts = Get {
+            pda_account: ctx.accounts.source_token.to_account_info(),
+        };
+        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+        let _is_transfer_valid =  transfer_hook_rule_engine::cpi::is_transfer_valid(cpi_ctx, ctx.accounts.source_token.key())?;
+        
         // if amount >= 10 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
         //     // we have a whale!
         //     ctx.accounts.latest_whale_account.whale_address = ctx.accounts.source_token.key();
@@ -154,6 +165,9 @@ pub struct TransferHook<'info> {
     pub extra_account_meta_list: UncheckedAccount<'info>,
     #[account(mut, seeds=[b"whale_account"], bump)]
     pub latest_whale_account: Account<'info, WhaleAccount>,
+    #[account(mut)]
+    pub transfer_hook_rule_engine: Account<'info, PDAAccount>,
+    pub transfer_hook_rule_engine_program: Program<'info, TransferHookRuleEngine>,
 }
 
 

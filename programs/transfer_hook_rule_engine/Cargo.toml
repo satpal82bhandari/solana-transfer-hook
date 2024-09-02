@@ -1,12 +1,12 @@
 [package]
-name = "transfer-hook-whale"
+name = "transfer_hook_rule_engine"
 version = "0.1.0"
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "transfer_hook_whale"
+name = "transfer_hook_rule_engine"
 
 [features]
 default = []
@@ -18,9 +18,4 @@ idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 
 [dependencies]
 anchor-lang = "0.30.0"
-#anchor-spl = "0.30.0"
 anchor-spl = { version = "0.30.0", features = ["metadata"] }
-transfer_hook_rule_engine = { path = "../transfer_hook_rule_engine", features = ["cpi"]}
-
-spl-tlv-account-resolution = "0.6.3"
-spl-transfer-hook-interface = "0.6.3"
