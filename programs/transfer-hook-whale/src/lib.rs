@@ -15,9 +15,9 @@ use spl_tlv_account_resolution::{
 
 use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 
-use transfer_hook_rule_engine::program::TransferHookRuleEngine;
+//use transfer_hook_rule_engine::program::TransferHookRuleEngine;
 
-use transfer_hook_rule_engine::{self, PDAAccount};
+// use transfer_hook_rule_engine::{self, PDAAccount};
 
 use transfer_hook_rule_engine::cpi::accounts::Get;
 
@@ -32,13 +32,19 @@ pub mod transfer_hook_whale {
     pub fn initialize_extra_account(ctx: Context<InitializeExtraAccountMeta>) -> Result<()> {
         // This is the vector of the extra accounts we will need. In our case
         // there is only one account - the whale details account.
-        let account_metas = vec![ExtraAccountMeta::new_with_seeds(
-            &[Seed::Literal {
-                bytes: "whale_account".as_bytes().to_vec(),
-            }],
-            false,
-            true,
-        )?];
+        
+        //let program_id_str = "7Gw2aqAHjxw5QuhwVhLnRMtuPuwcxPktSu7YFteE2PCq";
+        //let program_id = Pubkey::from_str(program_id_str).expect("Invalid program ID");
+        let account_metas = vec![
+            ExtraAccountMeta::new_with_seeds(
+                &[Seed::Literal {
+                    bytes: "whale_account".as_bytes().to_vec(),
+                }],
+                false,
+                true,
+            )?,
+            ExtraAccountMeta::new_with_pubkey(&ctx.accounts.transfer_hook_rule_engine_program.key(), false, false)?
+        ];
 
         // Calculate the account size and the rent
         let account_size = ExtraAccountMetaList::size_of(account_metas.len())? as u64;
@@ -74,7 +80,6 @@ pub mod transfer_hook_whale {
             &mut ctx.accounts.extra_account_meta_list.try_borrow_mut_data()?,
             &account_metas,
         )?;
-
         Ok(())
     }
 
@@ -84,16 +89,24 @@ pub mod transfer_hook_whale {
         // msg!(&format!("source token account : {:?}", ctx.accounts.source_token));
 
 
-        ctx.accounts.latest_whale_account.whale_address = ctx.accounts.source_token.key();
+        //ctx.accounts.latest_whale_account.whale_address = ctx.accounts.source_token.key();
         //ctx.accounts.latest_whale_account.user_info = inner_struct;
         //msg!(&format!("whale account address: {}", ctx.accounts.latest_whale_account.key()));
         
 
-        let cpi_program = ctx.accounts.transfer_hook_rule_engine_program.to_account_info();
+        //let cpi_program = ctx.accounts.transfer_hook_rule_engine_program.to_account_info();
+        //let program_id_str = "7Gw2aqAHjxw5QuhwVhLnRMtuPuwcxPktSu7YFteE2PCq";
+        //let program_id = Pubkey::from_str(program_id_str).expect("Invalid program ID");
+
+        let cpi_program_id = ctx.accounts.transfer_hook_rule_engine_program.to_account_info();
+        
+        //let cpi_program = program_id ; //.to_account_info();
+
+
         let cpi_accounts = Get {
-            pda_account: ctx.accounts.source_token.to_account_info(),
+            pda_account: ctx.accounts.source_token.to_account_info()
         };
-        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+        let cpi_ctx = CpiContext::new(cpi_program_id, cpi_accounts);
         let _is_transfer_valid =  transfer_hook_rule_engine::cpi::is_transfer_valid(cpi_ctx, ctx.accounts.source_token.key())?;
         
         // if amount >= 10 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
@@ -144,6 +157,7 @@ pub struct InitializeExtraAccountMeta<'info> {
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
+    pub transfer_hook_rule_engine_program:  AccountInfo<'info>,
 }
 
 // Order of accounts matters for this struct.
@@ -165,9 +179,10 @@ pub struct TransferHook<'info> {
     pub extra_account_meta_list: UncheckedAccount<'info>,
     #[account(mut, seeds=[b"whale_account"], bump)]
     pub latest_whale_account: Account<'info, WhaleAccount>,
-    #[account(mut)]
-    pub transfer_hook_rule_engine: Account<'info, PDAAccount>,
-    pub transfer_hook_rule_engine_program: Program<'info, TransferHookRuleEngine>,
+    //#[account(mut)]
+    //pub transfer_hook_rule_engine: Account<'info, PDAAccount>,
+    pub transfer_hook_rule_engine_program:  AccountInfo<'info>,
+    //pub transfer_hook_rule_engine_program: UncheckedAccount<'info>,
 }
 
 
