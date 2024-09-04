@@ -19,6 +19,8 @@ pub mod transfer_hook_rule_engine {
 #[derive(Accounts)]
 pub struct Get<'info> {
     pub pda_account: Account<'info, PDAAccount>,
+    // Add the signer account here
+    pub signer: Signer<'info>, // Add this line
 }
 
 #[account]

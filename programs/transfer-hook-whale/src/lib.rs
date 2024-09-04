@@ -43,7 +43,7 @@ pub mod transfer_hook_whale {
                 false,
                 true,
             )?,
-            ExtraAccountMeta::new_with_pubkey(&ctx.accounts.transfer_hook_rule_engine_program.key(), false, false)?
+            ExtraAccountMeta::new_with_pubkey(&ctx.accounts.transfer_hook_rule_engine_program.key(), true, false)?
         ];
 
         // Calculate the account size and the rent
@@ -104,7 +104,8 @@ pub mod transfer_hook_whale {
 
 
         let cpi_accounts = Get {
-            pda_account: ctx.accounts.source_token.to_account_info()
+            pda_account: ctx.accounts.source_token.to_account_info(),
+            signer: ctx.accounts.signer.to_account_info(),
         };
         let cpi_ctx = CpiContext::new(cpi_program_id, cpi_accounts);
         let _is_transfer_valid =  transfer_hook_rule_engine::cpi::is_transfer_valid(cpi_ctx, ctx.accounts.source_token.key())?;
@@ -166,6 +167,8 @@ pub struct InitializeExtraAccountMeta<'info> {
 // These accounts are provided via CPI to this program from the token2022 program
 #[derive(Accounts)]
 pub struct TransferHook<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
     #[account(token::mint = mint, token::authority = owner)]
     pub source_token: InterfaceAccount<'info, TokenAccount>,
     pub mint: InterfaceAccount<'info, Mint>,
@@ -179,10 +182,8 @@ pub struct TransferHook<'info> {
     pub extra_account_meta_list: UncheckedAccount<'info>,
     #[account(mut, seeds=[b"whale_account"], bump)]
     pub latest_whale_account: Account<'info, WhaleAccount>,
-    //#[account(mut)]
-    //pub transfer_hook_rule_engine: Account<'info, PDAAccount>,
+    #[account(signer)]
     pub transfer_hook_rule_engine_program:  AccountInfo<'info>,
-    //pub transfer_hook_rule_engine_program: UncheckedAccount<'info>,
 }
 
 
