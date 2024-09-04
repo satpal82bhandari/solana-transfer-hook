@@ -167,7 +167,7 @@ pub struct InitializeExtraAccountMeta<'info> {
 // These accounts are provided via CPI to this program from the token2022 program
 #[derive(Accounts)]
 pub struct TransferHook<'info> {
-    #[account(mut)]
+    #[account(signer)]
     pub signer: Signer<'info>,
     #[account(token::mint = mint, token::authority = owner)]
     pub source_token: InterfaceAccount<'info, TokenAccount>,
