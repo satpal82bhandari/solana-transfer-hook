@@ -145,6 +145,25 @@ pub mod transfer_hook_whale {
     }
 }
 
+
+pub fn test_cpi_call(ctx: Context<TransferHook>, amount: u64) -> Result<()> {
+
+    msg!(&format!("test_cpi_call is called with  {}", amount));
+    
+    let cpi_program_id = ctx.accounts.transfer_hook_rule_engine_program.to_account_info();
+    
+    let cpi_accounts = Get {
+        pda_account: ctx.accounts.signer.to_account_info(),
+        signer: ctx.accounts.signer.to_account_info(),
+    };
+    let cpi_ctx = CpiContext::new(cpi_program_id, cpi_accounts);
+    let _is_transfer_valid =  transfer_hook_rule_engine::cpi::is_transfer_valid(cpi_ctx, ctx.accounts.source_token.key())?;
+    msg!(&format!("is_transfer_valid is called"));
+    // }
+    Ok(())
+}
+
+
 #[derive(Accounts)]
 pub struct InitializeExtraAccountMeta<'info> {
     #[account(mut)]
@@ -186,6 +205,14 @@ pub struct TransferHook<'info> {
     pub transfer_hook_rule_engine_program:  AccountInfo<'info>,
 }
 
+
+#[derive(Accounts)]
+pub struct Testcpi<'info> {
+    #[account(signer)]
+    pub signer: Signer<'info>,
+    #[account(signer)]
+    pub transfer_hook_rule_engine_program:  AccountInfo<'info>,
+}
 
 #[account]
 
