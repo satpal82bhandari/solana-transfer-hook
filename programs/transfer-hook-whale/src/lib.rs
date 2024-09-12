@@ -11,8 +11,11 @@ use spl_tlv_account_resolution::{
     account::ExtraAccountMeta, seeds::Seed, state::ExtraAccountMetaList,
 };
 use spl_transfer_hook_interface::instruction::ExecuteInstruction;
+use puppet::cpi::accounts::SetData;
+use puppet::program::Puppet;
+use puppet::{self, Data};
 
-declare_id!("BVfCyy9BvUqLA3BHgBEK8SqZwLnvzraeAsEextE63Ngk");
+declare_id!("DfMxXYf1F1psudgS5Ypz7t7hRWBx7VVa4oV4RuCnyLpV");
 
 #[program]
 pub mod transfer_hook_whale {
@@ -107,6 +110,17 @@ pub mod transfer_hook_whale {
             _ => return Err(ProgramError::InvalidInstructionData.into()),
         }
     }
+
+    //<-!-------puppet-master instruction------------------->
+    pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: u64) -> Result<()> {
+        let bump = &[bump][..];
+        puppet::cpi::set_data(
+            ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),
+            data,
+        )
+    }
+
+    
 }
 
 #[derive(Accounts)]
@@ -145,6 +159,16 @@ pub struct TransferHook<'info> {
     pub latest_whale_account: Account<'info, WhaleAccount>,
 }
 
+#[derive(Accounts)]
+pub struct PullStrings<'info> {
+    #[account(mut)]
+    pub puppet: Account<'info, Data>,
+    pub puppet_program: Program<'info, Puppet>,
+    /// CHECK: only used as a signing PDA
+    pub authority: UncheckedAccount<'info>,
+}
+
+
 #[account]
 pub struct WhaleAccount {
     pub whale_address: Pubkey,
@@ -161,4 +185,15 @@ pub struct WhaleTransferEvent {
 pub enum MyError {
     #[msg("This is an error message clients will automatically display")]
     Hello,
+}
+
+impl<'info> PullStrings<'info> {
+    pub fn set_data_ctx(&self) -> CpiContext<'_, '_, '_, 'info, SetData<'info>> {
+        let cpi_program = self.puppet_program.to_account_info();
+        let cpi_accounts = SetData {
+            puppet: self.puppet.to_account_info(),
+            authority: self.authority.to_account_info(),
+        };
+        CpiContext::new(cpi_program, cpi_accounts)
+    }
 }
