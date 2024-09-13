@@ -4,16 +4,20 @@ use puppet::program::Puppet;
 use puppet::{self, Data};
 
 
-declare_id!("GnirgarFXEmqoQkkTTMu8t7kjWFA4MtuzNaXAE5UwitV");
+declare_id!("DEdZqyf4E4L8wCd3uPz39pu26FDCNFnsG56MwHXxVtwv");
 
 
 #[program]
 mod puppet_master {
     use super::*;
     pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: u64) -> Result<()> {
-        let bump = &[bump][..];
+        // let bump = &[bump][..];
+        let signer_seeds: &[&[&[u8]]] = &[&[
+            b"puppet",
+            &[bump],
+        ]];
         puppet::cpi::set_data(
-            ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),
+            ctx.accounts.set_data_ctx().with_signer(signer_seeds),
             data,
         )
     }

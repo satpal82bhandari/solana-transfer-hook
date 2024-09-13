@@ -26,7 +26,7 @@ describe('puppet', () => {
 
   it('Does CPI!', async () => {
     const [puppetMasterPDA, puppetMasterBump] =
-      await PublicKey.findProgramAddressSync([], puppetMasterProgram.programId);
+      await PublicKey.findProgramAddressSync([Buffer.from("puppet")], puppetMasterProgram.programId);
 
       console.log("****************************")
       console.log("PuppetMasterPDA : ", puppetMasterPDA.toBase58())
@@ -76,7 +76,7 @@ describe('puppet', () => {
       .accounts({
         puppetProgram: puppetProgram.programId,
         puppet: puppetKeypair.publicKey,
-        authority: puppetMasterPDA,
+        authority: puppetMasterPDA
       })
       .rpc();
 
