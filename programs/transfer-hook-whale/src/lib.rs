@@ -15,14 +15,12 @@ use spl_tlv_account_resolution::{
 
 use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 
-use transfer_hook_rule_engine::program::TransferHookRuleEngine;
-
-use transfer_hook_rule_engine::{self, PDAAccount};
-
-use transfer_hook_rule_engine::cpi::accounts::Get;
+use puppet::cpi::accounts::SetData;
+use puppet::program::Puppet;
+use puppet::{self, Data};
 
 
-declare_id!("HNAKhrYRMsFftBSBMzaLZ3EeJEBMj9zKhuPAd4YQsmct");
+declare_id!("7Gg65aJukHjvJGVysEy2EGmtMqYJo8Vcws6yDeCQHsHq");
 
 #[program]
 pub mod transfer_hook_whale {
@@ -55,19 +53,20 @@ pub mod transfer_hook_whale {
         ]];
 
         // Create the ExtraAccountMetaList account
+        
         create_account(
-            CpiContext::new(
-                ctx.accounts.system_program.to_account_info(),
-                CreateAccount {
-                    from: ctx.accounts.payer.to_account_info(),
-                    to: ctx.accounts.extra_account_meta_list.to_account_info(),
-                },
-            )
-            .with_signer(signer_seeds),
+            CpiContext::new(ctx.accounts.system_program.to_account_info(),CreateAccount {
+                from: ctx.accounts.payer.to_account_info(),
+                to: ctx.accounts.extra_account_meta_list.to_account_info(),},).with_signer(signer_seeds),
+            
             lamports,
             account_size,
             ctx.program_id,
-        )?;
+        )?;            
+                    
+            
+            
+        
 
         // Initialize the ExtraAccountMetaList account with the extra accounts
         ExtraAccountMetaList::init::<ExecuteInstruction>(
@@ -78,57 +77,68 @@ pub mod transfer_hook_whale {
         Ok(())
     }
 
-    pub fn transfer_hook(ctx: Context<TransferHook>, amount: u64) -> Result<()> {
+    pub fn transfer_hook(ctx: Context<TransferHook>, bump: u8, data: u64) -> Result<()> {
 
-        msg!(&format!("Transfer hook fired for an amount of {}", amount));
-        // msg!(&format!("source token account : {:?}", ctx.accounts.source_token));
+        // msg!(&format!("Transfer hook fired for an amount of {}", amount));
+        // // msg!(&format!("source token account : {:?}", ctx.accounts.source_token));
 
 
-        ctx.accounts.latest_whale_account.whale_address = ctx.accounts.source_token.key();
-        //ctx.accounts.latest_whale_account.user_info = inner_struct;
-        //msg!(&format!("whale account address: {}", ctx.accounts.latest_whale_account.key()));
+        // ctx.accounts.latest_whale_account.whale_address = ctx.accounts.source_token.key();
+        // //ctx.accounts.latest_whale_account.user_info = inner_struct;
+        // //msg!(&format!("whale account address: {}", ctx.accounts.latest_whale_account.key()));
         
 
-        let cpi_program = ctx.accounts.transfer_hook_rule_engine_program.to_account_info();
-        let cpi_accounts = Get {
-            pda_account: ctx.accounts.source_token.to_account_info(),
-        };
-        let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
-        let _is_transfer_valid =  transfer_hook_rule_engine::cpi::is_transfer_valid(cpi_ctx, ctx.accounts.source_token.key())?;
+        // let cpi_program = ctx.accounts.transfer_hook_rule_engine_program.to_account_info();
+        // let cpi_accounts = Get {
+        //     pda_account: ctx.accounts.source_token.to_account_info(),
+        // };
+        // let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+        // let _is_transfer_valid =  transfer_hook_rule_engine::cpi::is_transfer_valid(cpi_ctx, ctx.accounts.source_token.key())?;
         
-        // if amount >= 10 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
-        //     // we have a whale!
-        //     ctx.accounts.latest_whale_account.whale_address = ctx.accounts.source_token.key();
-        //     ctx.accounts.latest_whale_account.transfer_amount = amount;
-        //     msg!(&format!("whale account address {}", ctx.accounts.latest_whale_account.key()));
+        // // if amount >= 10 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
+        // //     // we have a whale!
+        // //     ctx.accounts.latest_whale_account.whale_address = ctx.accounts.source_token.key();
+        // //     ctx.accounts.latest_whale_account.transfer_amount = amount;
+        // //     msg!(&format!("whale account address {}", ctx.accounts.latest_whale_account.key()));
 
-        //     emit!(WhaleTransferEvent {
-        //         whale_address: ctx.owner.key(),
-        //         transfer_amount: amount,
-        //     });
-        // }
+        // //     emit!(WhaleTransferEvent {
+        // //         whale_address: ctx.owner.key(),
+        // //         transfer_amount: amount,
+        // //     });
+        // // }
+        //--------------------puppetmaster code------------------------------
+        let bump = &[bump][..];
+        let _ = puppet::cpi::set_data(
+            ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),
+            data,
+        );
+
+        //--------------------end of puppetmaster code-------------------------------------
+
+        
+       
         Ok(())
     }
 
-    pub fn fallback<'info>(
-        program_id: &Pubkey,
-        accounts: &'info [AccountInfo<'info>],
-        data: &[u8],
-    ) -> Result<()> {
-        let instruction = TransferHookInstruction::unpack(data)?;
+    // pub fn fallback<'info>(
+    //     program_id: &Pubkey,
+    //     accounts: &'info [AccountInfo<'info>],
+    //     data: &[u8],
+    // ) -> Result<()> {
+    //     let instruction = TransferHookInstruction::unpack(data)?;
 
-        // match instruction discriminator to transfer hook interface execute instruction
-        // token2022 program CPIs this instruction on token transfer
-        match instruction {
-            TransferHookInstruction::Execute { amount } => {
-                let amount_bytes = amount.to_le_bytes();
+    //     // match instruction discriminator to transfer hook interface execute instruction
+    //     // token2022 program CPIs this instruction on token transfer
+    //     match instruction {
+    //         TransferHookInstruction::Execute { bump,data } => {
+    //             let data_bytes = data.to_le_bytes();
 
-                // invoke custom transfer hook instruction on our program
-                __private::__global::transfer_hook(program_id, accounts, &amount_bytes)
-            }
-            _ => return Err(ProgramError::InvalidInstructionData.into()),
-        }
-    }
+    //             // invoke custom transfer hook instruction on our program
+    //             __private::__global::transfer_hook(program_id, accounts, &data_bytes)
+    //         }
+    //         _ => return Err(ProgramError::InvalidInstructionData.into()),
+    //     }
+    // }
 }
 
 #[derive(Accounts)]
@@ -165,9 +175,12 @@ pub struct TransferHook<'info> {
     pub extra_account_meta_list: UncheckedAccount<'info>,
     #[account(mut, seeds=[b"whale_account"], bump)]
     pub latest_whale_account: Account<'info, WhaleAccount>,
+    
     #[account(mut)]
-    pub transfer_hook_rule_engine: Account<'info, PDAAccount>,
-    pub transfer_hook_rule_engine_program: Program<'info, TransferHookRuleEngine>,
+    pub puppet: Account<'info, Data>,
+    pub puppet_program: Program<'info, Puppet>,
+    /// CHECK: only used as a signing PDA
+    pub authority: UncheckedAccount<'info>,
 }
 
 
@@ -186,9 +199,22 @@ pub struct NewWhaleAccount {
 }
 
 
-#[event]
-pub struct WhaleTransferEvent {
-    pub whale_address: Pubkey,
-    pub transfer_amount: u64,
+// #[event]
+// pub struct WhaleTransferEvent {
+//     pub whale_address: Pubkey,
+//     pub transfer_amount: u64,
+// }
+
+impl<'info> TransferHook<'info> {
+    pub fn set_data_ctx(&self) -> CpiContext<'_, '_, '_, 'info, SetData<'info>> {
+        let cpi_program = self.puppet_program.to_account_info();
+        let cpi_accounts = SetData {
+            puppet: self.puppet.to_account_info(),
+            authority: self.authority.to_account_info(),
+        };
+        CpiContext::new(cpi_program, cpi_accounts)
+    }
 }
+
+
 

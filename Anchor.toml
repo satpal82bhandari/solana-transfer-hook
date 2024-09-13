@@ -5,13 +5,12 @@ anchor_version = "0.30.0"
 resolution = false
 skip-lint = false
 
-[programs.devnet]
-transfer_hook_whale = "HNAKhrYRMsFftBSBMzaLZ3EeJEBMj9zKhuPAd4YQsmct"
-transfer_hook_rule_engine = "7Gw2aqAHjxw5QuhwVhLnRMtuPuwcxPktSu7YFteE2PCq"
+
 
 [programs.localnet]
-transfer_hook_rule_engine = "7Gw2aqAHjxw5QuhwVhLnRMtuPuwcxPktSu7YFteE2PCq"
-transfer_hook_whale = "HNAKhrYRMsFftBSBMzaLZ3EeJEBMj9zKhuPAd4YQsmct"
+puppet = "ArCKn3hCD2VLgK6Vk3qBiVagXX3k15BVj54mELqFUEpw"
+transfer_hook_whale = "7Gg65aJukHjvJGVysEy2EGmtMqYJo8Vcws6yDeCQHsHq"
+
 
 [registry]
 url = "https://api.devnet.solana.com"

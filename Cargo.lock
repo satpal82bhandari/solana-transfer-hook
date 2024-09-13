@@ -1497,6 +1497,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "puppet"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+]
+
+[[package]]
 name = "qstring"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2429,9 +2436,9 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
+ "puppet",
  "spl-tlv-account-resolution",
  "spl-transfer-hook-interface",
- "transfer_hook_rule_engine",
 ]
 
 [[package]]
