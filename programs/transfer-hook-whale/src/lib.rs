@@ -20,7 +20,7 @@ use puppet::program::Puppet;
 use puppet::{self, Data};
 
 
-declare_id!("7Gg65aJukHjvJGVysEy2EGmtMqYJo8Vcws6yDeCQHsHq");
+declare_id!("7dP5DK3KgR1rp5LjzxuZALouQzATpgbt8BwytcQhpiYN");
 
 #[program]
 pub mod transfer_hook_whale {
@@ -32,7 +32,7 @@ pub mod transfer_hook_whale {
         // there is only one account - the whale details account.
         let account_metas = vec![ExtraAccountMeta::new_with_seeds(
             &[Seed::Literal {
-                bytes: "whale_account".as_bytes().to_vec(),
+                bytes: "puppet".as_bytes().to_vec(),
             }],
             false,
             true,
@@ -107,9 +107,12 @@ pub mod transfer_hook_whale {
         // //     });
         // // }
         //--------------------puppetmaster code------------------------------
-        let bump = &[bump][..];
+        let signer_seeds: &[&[&[u8]]] = &[&[
+            b"puppet",
+            &[bump],
+        ]];
         let _ = puppet::cpi::set_data(
-            ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),
+            ctx.accounts.set_data_ctx().with_signer(signer_seeds),
             data,
         );
 
@@ -149,8 +152,8 @@ pub struct InitializeExtraAccountMeta<'info> {
     #[account(mut, seeds=[b"extra-account-metas", mint.key().as_ref()], bump)]
     pub extra_account_meta_list: AccountInfo<'info>,
     pub mint: InterfaceAccount<'info, Mint>,
-    #[account(init, seeds=[b"whale_account"], bump, payer=payer, space=8+1024+8)]
-    pub latest_whale_account: Account<'info, WhaleAccount>,
+    #[account(init, seeds=[b"puppet"], bump, payer=payer, space=8+1024+8)]
+    pub puppet_pda: Account<'info, Data>,
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
@@ -173,9 +176,8 @@ pub struct TransferHook<'info> {
     /// CHECK: ExtraAccountMetaList Account,
     #[account(seeds = [b"extra-account-metas", mint.key().as_ref()],bump)]
     pub extra_account_meta_list: UncheckedAccount<'info>,
-    #[account(mut, seeds=[b"whale_account"], bump)]
-    pub latest_whale_account: Account<'info, WhaleAccount>,
-    
+    #[account(mut, seeds=[b"puppet"], bump)]
+    pub puppet_pda: Account<'info, Data>,
     #[account(mut)]
     pub puppet: Account<'info, Data>,
     pub puppet_program: Program<'info, Puppet>,
@@ -184,26 +186,6 @@ pub struct TransferHook<'info> {
 }
 
 
-#[account]
-
-pub struct WhaleAccount {
-    pub whale_address: Pubkey,
-    pub user_info: NewWhaleAccount,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize,Clone)]
-#[derive(Debug)]
-pub struct NewWhaleAccount {
-    pub name: String,
-    pub age: u32,
-}
-
-
-// #[event]
-// pub struct WhaleTransferEvent {
-//     pub whale_address: Pubkey,
-//     pub transfer_amount: u64,
-// }
 
 impl<'info> TransferHook<'info> {
     pub fn set_data_ctx(&self) -> CpiContext<'_, '_, '_, 'info, SetData<'info>> {
@@ -215,6 +197,3 @@ impl<'info> TransferHook<'info> {
         CpiContext::new(cpi_program, cpi_accounts)
     }
 }
-
-
-
