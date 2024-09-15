@@ -9,8 +9,8 @@ pub mod puppet {
     use super::*;
     pub fn initialize(ctx: Context<Initialize>, authority: Pubkey) -> Result<()> {
         ctx.accounts.puppet.authority = authority;
-        msg!(&format!("puppet account : {:?}", ctx.accounts.puppet));
-        msg!(&format!("user account : {:?}", ctx.accounts.user));
+        msg!(&format!("puppet prog initialize method puppet value : {:?}", ctx.accounts.puppet));
+        msg!(&format!("puppet prog initialize method user value : {:?}", ctx.accounts.user));
         Ok(())
     }
     
@@ -19,8 +19,8 @@ pub mod puppet {
     pub fn set_data(ctx: Context<SetData>, data: u64) -> Result<()> {
         let puppet = &mut ctx.accounts.puppet;
         puppet.data = data;
-        msg!(&format!("puppet account : {:?}", ctx.accounts.puppet));
-        msg!(&format!("authorityPDA account : {:?}", ctx.accounts.authority));
+        msg!(&format!("puppet prog set_data method puppet value : {:?}", ctx.accounts.puppet));
+        msg!(&format!("puppet prog set_data method authorityPDA value : {:?}", ctx.accounts.authority));
         Ok(())
     }
 }
