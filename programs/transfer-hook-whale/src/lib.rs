@@ -114,9 +114,9 @@ pub mod transfer_hook_whale {
 
     //<-!-------puppet-master instruction------------------->
     pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: u64) -> Result<()> {
-        let bump = &[bump][..];
+        let signer_seeds: &[&[&[u8]]] = &[&[b"puppet",&[bump]]];
         puppet::cpi::set_data(
-            ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),
+            ctx.accounts.set_data_ctx().with_signer(signer_seeds),
             data,
         )
     }
