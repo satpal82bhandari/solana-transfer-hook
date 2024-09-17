@@ -33,3 +33,8 @@ Before you begin, ensure you have the following installed:
     ```bash
     anchor deploy
     ```
+4. **yarn install:**
+    ```bash
+    anchor test
+    ```
+5. 👾👾👾👾👾👾👾    🐵🐵🐵🐵

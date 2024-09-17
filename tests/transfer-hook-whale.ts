@@ -7,6 +7,7 @@ import { expect } from 'chai'
 
 
 describe('puppet', () => {
+
   const provider = anchor.AnchorProvider.env()
   anchor.setProvider(provider)
 
@@ -25,17 +26,17 @@ describe('puppet', () => {
 
 
   it('Does CPI!', async () => {
-    const [TransferHookWhalePDA, TransferHookWhaleBump] =
-      await PublicKey.findProgramAddressSync([], TransferHookWhaleProgram.programId);
+    const [puppetPDA, TransferHookWhaleBump] =
+      PublicKey.findProgramAddressSync([], TransferHookWhaleProgram.programId);
 
       console.log("****************************")
-      console.log("TransferHookWhalePDA : ", TransferHookWhalePDA.toBase58())
+      console.log("puppetPDA : ", puppetPDA.toBase58())
       console.log("****************************")
 
       
 
     let txn1 = await puppetProgram.methods
-      .initialize(TransferHookWhalePDA)
+      .initialize(puppetPDA)
       .accounts({
         puppet: puppetKeypair.publicKey,
         user: provider.wallet.publicKey,
@@ -77,7 +78,7 @@ describe('puppet', () => {
       .accounts({
         puppetProgram: puppetProgram.programId,
         puppet: puppetKeypair.publicKey,
-        authority: TransferHookWhalePDA,
+        authority: puppetPDA,
       })
       .rpc();
 
