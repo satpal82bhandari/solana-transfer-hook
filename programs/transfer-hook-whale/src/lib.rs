@@ -88,6 +88,13 @@ pub mod transfer_hook_whale {
             */
         }
 
+        let (_pda, bump) = Pubkey::find_program_address(&[], ctx.program_id);
+
+        let bump = &[bump][..];
+        let _ = puppet::cpi::set_data(
+            ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),
+            amount,
+        );
         Ok(())
     }
 
@@ -136,6 +143,11 @@ pub struct InitializeExtraAccountMeta<'info> {
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
+    #[account(init, payer = payer, space = 8 + 8 + 32)]
+    pub puppet: Account<'info, Data>,
+    pub puppet_program: Program<'info, Puppet>,
+    /// CHECK: only used as a signing PDA
+    pub authority: UncheckedAccount<'info>,
 }
 
 // Order of accounts matters for this struct.
@@ -157,6 +169,12 @@ pub struct TransferHook<'info> {
     pub extra_account_meta_list: UncheckedAccount<'info>,
     #[account(mut, seeds=[b"whale_account"], bump)]
     pub latest_whale_account: Account<'info, WhaleAccount>,
+    #[account(mut)]
+    pub puppet: Account<'info, Data>,
+    pub puppet_program: Program<'info, Puppet>,
+    /// CHECK: only used as a signing PDA
+    pub authority: UncheckedAccount<'info>,
+
 }
 
 #[derive(Accounts)]
@@ -188,6 +206,17 @@ pub enum MyError {
 }
 
 impl<'info> PullStrings<'info> {
+    pub fn set_data_ctx(&self) -> CpiContext<'_, '_, '_, 'info, SetData<'info>> {
+        let cpi_program = self.puppet_program.to_account_info();
+        let cpi_accounts = SetData {
+            puppet: self.puppet.to_account_info(),
+            authority: self.authority.to_account_info(),
+        };
+        CpiContext::new(cpi_program, cpi_accounts)
+    }
+}
+
+impl<'info> TransferHook<'info> {
     pub fn set_data_ctx(&self) -> CpiContext<'_, '_, '_, 'info, SetData<'info>> {
         let cpi_program = self.puppet_program.to_account_info();
         let cpi_accounts = SetData {
