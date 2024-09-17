@@ -4,11 +4,11 @@ import { Program } from '@coral-xyz/anchor';
 import { Keypair } from '@solana/web3.js';
 import { Connection, PublicKey } from "@solana/web3.js";
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-import { TransferHookWhale  } from "/home/ubuntu/solana/puppet_program_with_pda_inside_transfer_hook_program/solana-transfer-hook/target/types/transfer_hook_whale";
-import transfer_hook_idl from '/home/ubuntu/solana/puppet_program_with_pda_inside_transfer_hook_program/solana-transfer-hook/target/idl/transfer_hook_whale.json';
+import { TransferHookWhale  } from "/home/satpal/workspace/solana-transfer-hook/target/types/transfer_hook_whale";
+import transfer_hook_idl from '/home/satpal/workspace/solana-transfer-hook/target/idl/transfer_hook_whale.json';
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-import { Puppet  } from "/home/ubuntu/solana/puppet_program_with_pda_inside_transfer_hook_program/solana-transfer-hook/target/types/puppet";
-import puppet_idl from '/home/ubuntu/solana/puppet_program_with_pda_inside_transfer_hook_program/solana-transfer-hook/target/idl/puppet.json';
+import { Puppet  } from "/home/satpal/workspace/solana-transfer-hook/target/types/puppet";
+import puppet_idl from '/home/satpal/workspace/solana-transfer-hook/target/idl/puppet.json';
 
 //---------------------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ import { TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-
 import "dotenv/config";
 
 
-const kpFile = "/home/ubuntu/.config/solana/id.json";
+const kpFile = "/home/ubuntu/.config/solana/id_user1.json";
 
 
 const mint = new PublicKey("45MALcbrNKgmQTL4E2Ze2yh6LviFvvEfGQm7iRUUC2Kq"); // ~~~ mint public key   ~~~~
