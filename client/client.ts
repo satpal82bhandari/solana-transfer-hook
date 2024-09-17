@@ -68,7 +68,7 @@ const main = async () => {
 
     
 
-    const [puppetPDA, transferhookpuppetbump] = anchor.web3.PublicKey.findProgramAddressSync([], transfer_hook_program.programId);  
+    const [puppetPDA, transferhookpuppetbump] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("puppet")], transfer_hook_program.programId);  
 
     console.log("****************************")
 
