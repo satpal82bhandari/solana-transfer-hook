@@ -16,18 +16,15 @@ import { TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-
 import "dotenv/config";
 
 
-const kpFile = "/home/ubuntu/.config/solana/id_user1.json";
+const kpFile = "/home/satpal/.config/solana/id_user1.json";
 
 
-const mint = new PublicKey("45MALcbrNKgmQTL4E2Ze2yh6LviFvvEfGQm7iRUUC2Kq"); // ~~~ mint public key   ~~~~
+const mint = new PublicKey("EijXDGLRoBDGCCP5DvJrv5bRcMexaii9X5fx3HN2nWtT"); // ~~~ mint public key   ~~~~
 
 const main = async () => {
 
-    if (!process.env.SOLANA_RPC) {
-        console.log("Missing required env variables");
-        process.env.SOLANA_RPC = "http://127.0.0.1:8899";
-    }
-    process.env.SOLANA_RPC = "http://127.0.0.1:8899";
+    process.env.SOLANA_RPC = "https://api.devnet.solana.com";
+    //process.env.SOLANA_RPC = "http://127.0.0.1:8899";
 
     console.log("Reading wallet..."); 
     const keyFile = await readFile(kpFile);
@@ -94,48 +91,10 @@ const main = async () => {
 
       console.log("************************************");
     //-------------------------------------------------------------------------------------------
-
-
-    //======================for extra account meta list  instruction=============================
-
-    console.log("Initializing extra meta list  ....");
-
-    //1.
-
-    const [extraAccountMetaListPDA] = PublicKey.findProgramAddressSync(
-        [Buffer.from("extra-account-metas"), mint.toBuffer()],
-        transfer_hook_program.programId
-    );
-
-    //2.
-
-    const [whalePDA] = PublicKey.findProgramAddressSync([Buffer.from("whale_account")], transfer_hook_program.programId);
-
-    //3.-----------------------transaction for extra-meta-list starts------------------------
-
-    const initializeExtraAccountMetaListInstruction = await transfer_hook_program.methods
-        .initializeExtraAccount()
-        .accounts({
-            mint,
-            extraAccountMetaList: extraAccountMetaListPDA,
-            latestWhaleAccount: whalePDA,
-            systemProgram: anchor.web3.SystemProgram.programId,
-            tokenProgram: TOKEN_2022_PROGRAM_ID,
-            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-        })
-        .instruction();
-
-    const transaction = new anchor.web3.Transaction().add(initializeExtraAccountMetaListInstruction);
-
-    const transfer_hook_tx = await anchor.web3.sendAndConfirmTransaction(connection, transaction, [wallet.payer], {
-        commitment: "confirmed",
-    });
-
-    console.log("Transfer Hook Initialize Transaction Signature :-> ", transfer_hook_tx);
-
-    //------------------transaction-ends------------------------------------------------------
-      
+  
     //-------------transaction for puppet-master-------------------------------------------------------------------
+    
+    /*
     console.log("Running Pull String instruction ....");
 
     let txn2 = await transfer_hook_program.methods
@@ -150,6 +109,7 @@ const main = async () => {
     console.log("************************************")
     console.log("pullstring transaction : ", txn2)
     console.log("************************************")
+    */
 //==========================================================================================================
 
 }

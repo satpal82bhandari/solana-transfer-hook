@@ -89,11 +89,21 @@ pub mod transfer_hook_whale {
             */
         }
 
-        let (_pda, bump) = Pubkey::find_program_address(&[], ctx.program_id);
+        let (_pda, bump) = Pubkey::find_program_address(&[b"puppet"], ctx.program_id);
 
-        let bump = &[bump][..];
+        msg!(&format!("transfer_hook method for _pda value {}", _pda));
+
+        let signer_seeds: &[&[&[u8]]] = &[&[b"puppet",&[bump]]];
+
+        //let bump = &[bump][..];
+        let cpi_program = ctx.accounts.puppet_program.to_account_info();
+        let cpi_accounts = SetData {
+            puppet: ctx.accounts.puppet.to_account_info(),
+            authority: ctx.accounts.authority.to_account_info(),
+        };
+        
         let _ = puppet::cpi::set_data(
-            ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),
+            CpiContext::new(cpi_program, cpi_accounts).with_signer(signer_seeds),
             amount,
         );
         Ok(())
@@ -144,7 +154,7 @@ pub struct InitializeExtraAccountMeta<'info> {
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
-    #[account(init, payer = payer, space = 8 + 8 + 32)]
+    #[account(mut)]
     pub puppet: Account<'info, Data>,
     pub puppet_program: Program<'info, Puppet>,
     /// CHECK: only used as a signing PDA
@@ -175,7 +185,6 @@ pub struct TransferHook<'info> {
     pub puppet_program: Program<'info, Puppet>,
     /// CHECK: only used as a signing PDA
     pub authority: UncheckedAccount<'info>,
-
 }
 
 #[derive(Accounts)]

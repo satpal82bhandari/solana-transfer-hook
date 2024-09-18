@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "client": "ts-node ./src/client.ts"
+    "client_puppet": "ts-node ./client_puppet.ts",
+    "client_transfer_hook": "ts-node ./client_transfer_hook.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",
