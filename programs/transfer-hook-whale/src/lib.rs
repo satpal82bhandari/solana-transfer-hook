@@ -16,7 +16,7 @@ use puppet::cpi::accounts::SetData;
 use puppet::program::Puppet;
 use puppet::{self, Data};
 
-declare_id!("7dP5DK3KgR1rp5LjzxuZALouQzATpgbt8BwytcQhpiYN");
+declare_id!("3LQWPqUBVvWzSRSbrBojxVxN2oscawvZHmS82KQNMyAi");
 
 #[program]
 pub mod transfer_hook_whale {
@@ -32,7 +32,28 @@ pub mod transfer_hook_whale {
             }],
             false,
             true,
-        )?];
+        )?,
+        
+        ExtraAccountMeta::new_with_pubkey(
+            &ctx.accounts.puppet.key(),
+            false,
+            true,
+        )?,        
+        ExtraAccountMeta::new_with_pubkey(
+            &ctx.accounts.puppet_program.key(),
+            false,
+            true,
+        )?,
+        ExtraAccountMeta::new_with_pubkey(
+            &ctx.accounts.authority.key(),
+            false,
+            true,
+        )?,
+        ];
+
+
+        // ctx.accounts.latest_whale_account.whale_address = ctx.accounts.puppet_program.key();
+
 
         // Calculate the account size and the rent
         let account_size = ExtraAccountMetaList::size_of(account_metas.len())? as u64;
@@ -68,6 +89,8 @@ pub mod transfer_hook_whale {
             &mut ctx.accounts.extra_account_meta_list.try_borrow_mut_data()?,
             &account_metas,
         )?;
+        
+        ctx.accounts.latest_whale_account.whale_address = ctx.accounts.puppet_program.key();
 
         Ok(())
     }

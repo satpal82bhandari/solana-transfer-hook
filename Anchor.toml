@@ -6,19 +6,19 @@ resolution = false
 skip-lint = false
 
 [programs.devnet]
-puppet = "BKxpuFwFT4UYTVegRDUc9WtkU6LXxMDJ1QCuck4FFhke"
-transfer_hook_whale = "7dP5DK3KgR1rp5LjzxuZALouQzATpgbt8BwytcQhpiYN"
+puppet = "JCfYWiDCnauymmxDuSyGu9h9fz3wVYTjxvMk22RFxXG2"
+transfer_hook_whale = "3LQWPqUBVvWzSRSbrBojxVxN2oscawvZHmS82KQNMyAi"
 
 [programs.localnet]
-puppet = "BKxpuFwFT4UYTVegRDUc9WtkU6LXxMDJ1QCuck4FFhke"
-transfer_hook_whale = "7dP5DK3KgR1rp5LjzxuZALouQzATpgbt8BwytcQhpiYN"
+puppet = "JCfYWiDCnauymmxDuSyGu9h9fz3wVYTjxvMk22RFxXG2"
+transfer_hook_whale = "3LQWPqUBVvWzSRSbrBojxVxN2oscawvZHmS82KQNMyAi"
 
 [registry]
 url = "http://127.0.0.1:8899"
 
 [provider]
 cluster = "Localnet"
-wallet = "~/.config/solana/id_user11.json"
+wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
