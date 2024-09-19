@@ -16,7 +16,7 @@ use puppet::cpi::accounts::SetData;
 use puppet::program::Puppet;
 use puppet::{self, Data};
 
-declare_id!("3LQWPqUBVvWzSRSbrBojxVxN2oscawvZHmS82KQNMyAi");
+declare_id!("Fx1kWvaPZqcp6SWVNYLZD9Z2LoQB5VebfpPu22ejvLB1");
 
 #[program]
 pub mod transfer_hook_whale {
