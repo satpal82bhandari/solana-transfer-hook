@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 
-declare_id!("AXHybVqvf5C1mJkRp5WHoNBmSTyzdhvswFUoYheL798q");
+declare_id!("HgomfMLMMUFza23jSAacNgfib2GpBsu5byLdQ4CxcPTF");
 
 
 #[program]
@@ -16,9 +16,17 @@ pub mod puppet {
     
 
 
-    pub fn set_data(ctx: Context<SetData>, data: u64) -> Result<()> {
+    pub fn set_data(ctx: Context<SetData>, data: Vec<u64>) -> Result<()> {
         let puppet = &mut ctx.accounts.puppet;
-        puppet.data = data;
+
+        let initial_length = puppet.my_vec.len();
+        msg!(&format!("initial length : {}", initial_length));
+
+        puppet.my_vec.extend(data);   
+
+        let final_length = puppet.my_vec.len();   
+        msg!(&format!("final length : {}", final_length));
+
         msg!(&format!("puppet account : {:?}", ctx.accounts.puppet));
         msg!(&format!("authorityPDA account : {:?}", ctx.accounts.authority));
         Ok(())
@@ -28,7 +36,7 @@ pub mod puppet {
 #[derive(Accounts)]
 #[derive(Debug)]
 pub struct Initialize<'info> {
-    #[account(init, payer = user, space = 8 + 8 + 32)]
+    #[account(init, payer = user, space = 8 + 8 + 1024)]
     pub puppet: Account<'info, Data>,
     #[account(mut)]
     pub user: Signer<'info>,
@@ -49,7 +57,9 @@ pub struct SetData<'info> {
 #[account]
 #[derive(Debug)]
 pub struct Data {
-    pub data: u64,
+    pub my_vec : Vec<u64>,
     pub authority: Pubkey
 }
+
+
 

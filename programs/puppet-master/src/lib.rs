@@ -4,13 +4,15 @@ use puppet::program::Puppet;
 use puppet::{self, Data};
 
 
-declare_id!("GnirgarFXEmqoQkkTTMu8t7kjWFA4MtuzNaXAE5UwitV");
+declare_id!("DPkboFCs8qqEKvU3KThHJfXqKpTkHZcHmMDKuH2N6kJx");
 
 
 #[program]
 mod puppet_master {
     use super::*;
-    pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: u64) -> Result<()> {
+    pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: Vec<u64>) -> Result<()> {
+        msg!("Received bump: {}", bump);
+        msg!("Received data: {:?}", data);
         let bump = &[bump][..];
         puppet::cpi::set_data(
             ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),
