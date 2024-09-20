@@ -4,7 +4,7 @@ use puppet::program::Puppet;
 use puppet::{self, Data};
 
 
-declare_id!("6eW6a3r6ceSSneWLVPpvPXqW9mysPKXtukuJjwxivyfk");
+declare_id!("2RVXjcHT9mpNKafQUNvHx1i3J5x1kT1qjYpr7ViwM47i");
 
 
 
@@ -15,7 +15,7 @@ mod puppet_master {
     pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: Vec<puppet::DataItem>) -> Result<()> {
         msg!("Received bump: {}", bump);
         for item in data.iter() {
-            msg!("daily: {}, weekly: {}, monthly: {}", item.daily, item.weekly, item.monthly);
+            msg!("daily: {}, weekly: {}, monthly: {}, user_name: {}, user_wallet_pubkey: {}", item.daily, item.weekly, item.monthly, item.user_name , item.user_wallet_pubkey);
         };
         
         let bump = &[bump][..];

@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 
-declare_id!("E6xfecKQcAaSjKCvr1ojkq6zoy3QLiiBcP1KVVHCbDFU");
+declare_id!("57yhDyrrTENWyor87Whm7HXjGayTus1CScEoPbw79RQm");
 
 
 #[program]
@@ -68,6 +68,8 @@ pub struct DataItem {
     pub daily: u64,
     pub weekly: u64,
     pub monthly: u64,
+    pub user_name: String,
+    pub user_wallet_pubkey: Pubkey
     
 }
 
