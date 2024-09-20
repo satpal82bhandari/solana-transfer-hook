@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 
-declare_id!("HgomfMLMMUFza23jSAacNgfib2GpBsu5byLdQ4CxcPTF");
+declare_id!("E6xfecKQcAaSjKCvr1ojkq6zoy3QLiiBcP1KVVHCbDFU");
 
 
 #[program]
@@ -16,7 +16,7 @@ pub mod puppet {
     
 
 
-    pub fn set_data(ctx: Context<SetData>, data: Vec<u64>) -> Result<()> {
+    pub fn set_data(ctx: Context<SetData>, data: Vec<DataItem>) -> Result<()> {
         let puppet = &mut ctx.accounts.puppet;
 
         let initial_length = puppet.my_vec.len();
@@ -57,8 +57,18 @@ pub struct SetData<'info> {
 #[account]
 #[derive(Debug)]
 pub struct Data {
-    pub my_vec : Vec<u64>,
+    pub my_vec : Vec<DataItem>,
     pub authority: Pubkey
+}
+
+#[account]
+#[derive(Debug)]
+
+pub struct DataItem {
+    pub daily: u64,
+    pub weekly: u64,
+    pub monthly: u64,
+    
 }
 
 

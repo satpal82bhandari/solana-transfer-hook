@@ -4,15 +4,20 @@ use puppet::program::Puppet;
 use puppet::{self, Data};
 
 
-declare_id!("DPkboFCs8qqEKvU3KThHJfXqKpTkHZcHmMDKuH2N6kJx");
+declare_id!("6eW6a3r6ceSSneWLVPpvPXqW9mysPKXtukuJjwxivyfk");
+
+
 
 
 #[program]
 mod puppet_master {
     use super::*;
-    pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: Vec<u64>) -> Result<()> {
+    pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: Vec<puppet::DataItem>) -> Result<()> {
         msg!("Received bump: {}", bump);
-        msg!("Received data: {:?}", data);
+        for item in data.iter() {
+            msg!("daily: {}, weekly: {}, monthly: {}", item.daily, item.weekly, item.monthly);
+        };
+        
         let bump = &[bump][..];
         puppet::cpi::set_data(
             ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),

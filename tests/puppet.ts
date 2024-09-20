@@ -71,16 +71,32 @@ describe('puppet', () => {
 
 //----------------------------------------------------------------------------------------------------
 // Sample data (numbers you want to pass as `u64[]`)
-const u64Values = [123456789, 987654321, 1122334455];
+const Values = [
+  {
+    daily:15,
+    weekly: 20,
+    monthly: 25,
+  },
+  {
+    daily:20,
+    weekly: 25,
+    monthly: 30,
+  },];
 
-// Convert each number to a BN object (as u64) for Solana
-const bnArray = u64Values.map(value => new anchor.BN(value));
+/// Convert each number to a BN object (as u64) for Solana
+const bnArray = Values.map(value => ({
+  daily: new anchor.BN(value.daily),   // Convert each field to BN
+  weekly: new anchor.BN(value.weekly), 
+  monthly: new anchor.BN(value.monthly),
+}));
+
+
 
 
     let txn2 = await puppetMasterProgram.methods
       .pullStrings(puppetMasterBump, bnArray)
       .accounts({
-        puppetProgram: puppetProgram.programId,
+        // puppetProgram: puppetProgram.programId,
         puppet: puppetKeypair.publicKey,
         authority: puppetMasterPDA,
       })
