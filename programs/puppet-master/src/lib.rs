@@ -4,7 +4,7 @@ use puppet::program::Puppet;
 use puppet::{self, Data};
 
 
-declare_id!("2RVXjcHT9mpNKafQUNvHx1i3J5x1kT1qjYpr7ViwM47i");
+declare_id!("4owkar2kmqCHRfdGxqGYEDoNt3A77JJg4sVJfX4QCLU9");
 
 
 
@@ -12,17 +12,18 @@ declare_id!("2RVXjcHT9mpNKafQUNvHx1i3J5x1kT1qjYpr7ViwM47i");
 #[program]
 mod puppet_master {
     use super::*;
-    pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: Vec<puppet::DataItem>) -> Result<()> {
-        msg!("Received bump: {}", bump);
-        for item in data.iter() {
-            msg!("daily: {}, weekly: {}, monthly: {}, user_name: {}, user_wallet_pubkey: {}", item.daily, item.weekly, item.monthly, item.user_name , item.user_wallet_pubkey);
-        };
+    pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: u64) -> Result<()> {
         
         let bump = &[bump][..];
         puppet::cpi::set_data(
             ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),
             data,
-        )
+        );
+        if data == 3 {
+            return Err(anchor_lang::error::ErrorCode::ConstraintClose.into());
+        };
+            
+        Ok(())
     }
 }
 

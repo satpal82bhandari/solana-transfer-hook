@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 
-declare_id!("57yhDyrrTENWyor87Whm7HXjGayTus1CScEoPbw79RQm");
+declare_id!("FkTaJm3QJ1xqJWY3HZa3kruVUSJXLZDx7YT4RjBerPAK");
 
 
 #[program]
@@ -16,17 +16,9 @@ pub mod puppet {
     
 
 
-    pub fn set_data(ctx: Context<SetData>, data: Vec<DataItem>) -> Result<()> {
+    pub fn set_data(ctx: Context<SetData>, data: u64) -> Result<()> {
         let puppet = &mut ctx.accounts.puppet;
-
-        let initial_length = puppet.my_vec.len();
-        msg!(&format!("initial length : {}", initial_length));
-
-        puppet.my_vec.extend(data);   
-
-        let final_length = puppet.my_vec.len();   
-        msg!(&format!("final length : {}", final_length));
-
+        puppet.data = data;
         msg!(&format!("puppet account : {:?}", ctx.accounts.puppet));
         msg!(&format!("authorityPDA account : {:?}", ctx.accounts.authority));
         Ok(())
@@ -57,21 +49,21 @@ pub struct SetData<'info> {
 #[account]
 #[derive(Debug)]
 pub struct Data {
-    pub my_vec : Vec<DataItem>,
+    pub data: u64,
     pub authority: Pubkey
 }
 
-#[account]
-#[derive(Debug)]
+// #[account]
+// #[derive(Debug)]
 
-pub struct DataItem {
-    pub daily: u64,
-    pub weekly: u64,
-    pub monthly: u64,
-    pub user_name: String,
-    pub user_wallet_pubkey: Pubkey
+// pub struct DataItem {
+//     pub daily: u64,
+//     pub weekly: u64,
+//     pub monthly: u64,
+//     pub user_name: String,
+//     pub user_wallet_pubkey: Pubkey
     
-}
+// }
 
 
 

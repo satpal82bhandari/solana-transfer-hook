@@ -57,7 +57,7 @@ const main = async () => {
   // console.log("***************************");
   // console.log("puppet account : ",puppetKeypair.publicKey.toBase58());
 
-  const puppetKeypair = new PublicKey("37eDYZaty1AbnQ4YcaxCMSCwWqREoWcqFocdFQH4bqAw");
+  const puppetAccountKeypair = new PublicKey("9hLQ4jn17F5xQE89HxJWT1XLztDxPhGDs1WXFadvW2Jj");
 
 
   console.log("***************************");
@@ -74,39 +74,39 @@ const main = async () => {
 
 
   //----------------------------------------------------------------------------------------------------
-  // Sample data 
-  const Values = [
-    {
-      daily: 15,
-      weekly: 20,
-      monthly: 25,
-      user_name: "Ankur",
-      user_wallet_pubkey: new PublicKey("3XyuDwVWSf8AaeAhVGuuF8cdfvAVDgv9AhiFznpiJHuB")
-    },
-    {
-      daily: 20,
-      weekly: 25,
-      monthly: 30,
-      user_name: "Nishant",
-      user_wallet_pubkey: new PublicKey("HLzfQx8Nm51vcwR7gtoVTmAk1LE1BmjntzN8ExXPCG9H")
-    },];
+  // // Sample data 
+  // const Values = [
+  //   {
+  //     daily: 15,
+  //     weekly: 20,
+  //     monthly: 25,
+  //     user_name: "Ankur",
+  //     user_wallet_pubkey: new PublicKey("3XyuDwVWSf8AaeAhVGuuF8cdfvAVDgv9AhiFznpiJHuB")
+  //   },
+  //   {
+  //     daily: 20,
+  //     weekly: 25,
+  //     monthly: 30,
+  //     user_name: "Nishant",
+  //     user_wallet_pubkey: new PublicKey("HLzfQx8Nm51vcwR7gtoVTmAk1LE1BmjntzN8ExXPCG9H")
+  //   },];
 
-  /// Convert each number to a BN object (as u64) for Solana
-  const bnArray = Values.map(value => ({
-    daily: new anchor.BN(value.daily),   // Convert each field to BN
-    weekly: new anchor.BN(value.weekly),
-    monthly: new anchor.BN(value.monthly),
-    userName: value.user_name,
-    userWalletPubkey: value.user_wallet_pubkey,
-  }));
+  // /// Convert each number to a BN object (as u64) for Solana
+  // const bnArray = Values.map(value => ({
+  //   daily: new anchor.BN(value.daily),   // Convert each field to BN
+  //   weekly: new anchor.BN(value.weekly),
+  //   monthly: new anchor.BN(value.monthly),
+  //   userName: value.user_name,
+  //   userWalletPubkey: value.user_wallet_pubkey,
+  // }));
 
 
 
   let txn2 = await puppetMasterProgram.methods
-    .pullStrings(puppetMasterBump, bnArray)
+    .pullStrings(puppetMasterBump, new anchor.BN(3))
     .accounts({
       // puppetProgram: puppetProgram.programId,
-      puppet: puppetKeypair,
+      puppet: puppetAccountKeypair,
       authority: puppetMasterPDA,
     })
     .rpc();
@@ -114,6 +114,13 @@ const main = async () => {
   console.log("****************************")
   console.log("pullstring transaction : ", txn2)
   console.log("****************************");
+
+  // Fetch the account data
+  const accountData = await puppetProgram.account.data.fetch(puppetAccountKeypair);
+  console.log("Account data:", accountData);
+
+  // Print in a readable format
+  console.log("Data:", accountData.data.toString());
 
 
 };
