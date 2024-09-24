@@ -17,7 +17,7 @@ import "dotenv/config";
 
 const kpFile = "/home/ubuntu/.config/solana/id.json"; // ~~ wallet keypair path ~~
 
-const mint = new PublicKey("G51cvzPW4MtFUusVZTh8VxmiwvUJEWUCMeqYzNCzRQFa"); // ~~~ mint public key   ~~~~
+const mint = new PublicKey("BtsxNUTCaShQVRegLhmThX7vDGz8DevB5rjij92g1AUj"); // ~~~ mint public key   ~~~~
 // const puppet_account_public_key = new PublicKey("HQhZhuAQSo62rNwF7R4GzSxdCcLHb4yur9LD1HVuxh8j");// ~~~ puppet account public key ~~~~
 
 const main = async () => {
@@ -77,18 +77,18 @@ const main = async () => {
     // -----------------------transaction-for puppet------------------------
     console.log("Initialize Puppet Account ....");
     const txn1 = await puppet_program.methods
-      .initialize(puppetPDA)
-      .accounts({
+    .initialize(puppetPDA)
+    .accounts({
         puppet: puppetKeypair.publicKey,
         user: wallet.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-      })
-      .signers([puppetKeypair])
-      .rpc();
-    
-      console.log("************************************");
-      console.log("initialize transaction : ", txn1);
-      console.log("************************************");
+    })
+    .signers([puppetKeypair])
+    .rpc();
+
+    console.log("************************************");
+    console.log("initialize transaction : ", txn1);
+    console.log("************************************");
     //-------------------------------------------------------------------------------------------
 
 

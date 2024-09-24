@@ -6,12 +6,12 @@ resolution = false
 skip-lint = false
 
 [programs.devnet]
-puppet = "2FQwuzDa6xZ6QCY3DWozMWmRVK6CPxGKKuwaGGsiVT87"
-transfer_hook_whale = "Fx1kWvaPZqcp6SWVNYLZD9Z2LoQB5VebfpPu22ejvLB1"
+puppet = "BkZHVRYhg838XMX7NKCwHgsctC2ir5iqYBH2GyQwFZxT"
+transfer_hook_whale = "F72oEg6rd4ncb9x1jGYDArZ5Hg9XrfwUodNmDUqRSsbi"
 
 [programs.localnet]
-puppet = "2FQwuzDa6xZ6QCY3DWozMWmRVK6CPxGKKuwaGGsiVT87"
-transfer_hook_whale = "Fx1kWvaPZqcp6SWVNYLZD9Z2LoQB5VebfpPu22ejvLB1"
+puppet = "5tJkUrWaZDVvdUVBybpmrKKHPJGF9qMcEFHX72c7ZhmJ"
+transfer_hook_whale = "FiJzkbRNrJcrT6M2qpdx6FGnPcFkb7SR7EyXPpHNXory"
 
 [registry]
 url = "http://127.0.0.1:8899"

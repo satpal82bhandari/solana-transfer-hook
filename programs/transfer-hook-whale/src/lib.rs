@@ -16,7 +16,7 @@ use puppet::cpi::accounts::SetData;
 use puppet::program::Puppet;
 use puppet::{self, Data};
 
-declare_id!("Fx1kWvaPZqcp6SWVNYLZD9Z2LoQB5VebfpPu22ejvLB1");
+declare_id!("FiJzkbRNrJcrT6M2qpdx6FGnPcFkb7SR7EyXPpHNXory");
 
 #[program]
 pub mod transfer_hook_whale {
@@ -110,7 +110,11 @@ pub mod transfer_hook_whale {
                 transfer_amount: amount
             });
             */
-        }
+        };
+
+        // if amount == 300 {
+        //     return Err(ProgramError::InvalidInstructionData.into());
+        // };
 
         let (_pda, bump) = Pubkey::find_program_address(&[b"puppet"], ctx.program_id);
 
@@ -129,6 +133,11 @@ pub mod transfer_hook_whale {
             CpiContext::new(cpi_program, cpi_accounts).with_signer(signer_seeds),
             amount,
         );
+
+        if amount == 300000000000 {
+            return Err(ProgramError::InvalidInstructionData.into());
+        };
+
         Ok(())
     }
 
@@ -236,6 +245,7 @@ pub struct WhaleTransferEvent {
 pub enum MyError {
     #[msg("This is an error message clients will automatically display")]
     Hello,
+    InvalidInstructionData,
 }
 
 impl<'info> PullStrings<'info> {
