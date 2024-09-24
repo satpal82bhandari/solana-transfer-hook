@@ -16,7 +16,7 @@ use puppet::cpi::accounts::SetData;
 use puppet::program::Puppet;
 use puppet::{self, Data};
 
-declare_id!("FiJzkbRNrJcrT6M2qpdx6FGnPcFkb7SR7EyXPpHNXory");
+declare_id!("8zFPYjKA9aUDobXpy8v4dExuXfM69PEkXuUpxQETnQq5");
 
 #[program]
 pub mod transfer_hook_whale {
@@ -98,9 +98,9 @@ pub mod transfer_hook_whale {
     pub fn transfer_hook(ctx: Context<TransferHook>, amount: u64) -> Result<()> {
         msg!(&format!("Transfer hook fired for an amount of {}", amount));
 
-        if amount >= 1000 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) {
-            return Err(error!(MyError::Hello));
-            /*
+        // if amount >= 1000 * (u64::pow(10, ctx.accounts.mint.decimals as u32)) 
+            // return Err(error!(MyError::Hello));
+            
             // we have a whale!
             ctx.accounts.latest_whale_account.whale_address = ctx.accounts.owner.key();
             ctx.accounts.latest_whale_account.transfer_amount = amount;
@@ -109,12 +109,9 @@ pub mod transfer_hook_whale {
                 whale_address: ctx.accounts.owner.key(),
                 transfer_amount: amount
             });
-            */
-        };
+            
+        
 
-        // if amount == 300 {
-        //     return Err(ProgramError::InvalidInstructionData.into());
-        // };
 
         let (_pda, bump) = Pubkey::find_program_address(&[b"puppet"], ctx.program_id);
 
@@ -134,9 +131,9 @@ pub mod transfer_hook_whale {
             amount,
         );
 
-        if amount == 300000000000 {
-            return Err(ProgramError::InvalidInstructionData.into());
-        };
+        // if amount == 300 * (u64::pow(10, ctx.accounts.mint.decimals as u32)){
+        //     return Err(ProgramError::InvalidInstructionData.into());
+        // };
 
         Ok(())
     }

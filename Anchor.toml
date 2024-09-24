@@ -10,8 +10,8 @@ puppet = "BkZHVRYhg838XMX7NKCwHgsctC2ir5iqYBH2GyQwFZxT"
 transfer_hook_whale = "F72oEg6rd4ncb9x1jGYDArZ5Hg9XrfwUodNmDUqRSsbi"
 
 [programs.localnet]
-puppet = "5tJkUrWaZDVvdUVBybpmrKKHPJGF9qMcEFHX72c7ZhmJ"
-transfer_hook_whale = "FiJzkbRNrJcrT6M2qpdx6FGnPcFkb7SR7EyXPpHNXory"
+puppet = "7M1JLkXJWjr6fxRDL2pSa2VWgEEEEDPYwtVRnoZZKeCr"
+transfer_hook_whale = "8zFPYjKA9aUDobXpy8v4dExuXfM69PEkXuUpxQETnQq5"
 
 [registry]
 url = "http://127.0.0.1:8899"

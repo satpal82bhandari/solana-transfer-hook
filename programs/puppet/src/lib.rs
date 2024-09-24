@@ -1,8 +1,6 @@
 use anchor_lang::prelude::*;
 
-
-declare_id!("5tJkUrWaZDVvdUVBybpmrKKHPJGF9qMcEFHX72c7ZhmJ");
-
+declare_id!("7M1JLkXJWjr6fxRDL2pSa2VWgEEEEDPYwtVRnoZZKeCr");
 
 #[program]
 pub mod puppet {
@@ -13,20 +11,24 @@ pub mod puppet {
         msg!(&format!("user account : {:?}", ctx.accounts.user));
         Ok(())
     }
-    
-
 
     pub fn set_data(ctx: Context<SetData>, data: u64) -> Result<()> {
         let puppet = &mut ctx.accounts.puppet;
         puppet.data = data;
         msg!(&format!("puppet account : {:?}", ctx.accounts.puppet));
-        msg!(&format!("authorityPDA account : {:?}", ctx.accounts.authority));
+        msg!(&format!(
+            "authorityPDA account : {:?}",
+            ctx.accounts.authority
+        ));
+
+        if data == 300 * (u64::pow(10, 9)) {
+            return Err(ProgramError::InvalidInstructionData.into());
+        };
         Ok(())
     }
 }
 
-#[derive(Accounts)]
-#[derive(Debug)]
+#[derive(Accounts, Debug)]
 pub struct Initialize<'info> {
     #[account(init, payer = user, space = 8 + 8 + 32)]
     pub puppet: Account<'info, Data>,
@@ -35,21 +37,16 @@ pub struct Initialize<'info> {
     pub system_program: Program<'info, System>,
 }
 
-
-
 #[derive(Accounts)]
 pub struct SetData<'info> {
     #[account(mut, has_one = authority)]
     pub puppet: Account<'info, Data>,
-    pub authority: Signer<'info>
+    pub authority: Signer<'info>,
 }
-
-
 
 #[account]
 #[derive(Debug)]
 pub struct Data {
     pub data: u64,
-    pub authority: Pubkey
+    pub authority: Pubkey,
 }
-
