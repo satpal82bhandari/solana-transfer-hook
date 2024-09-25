@@ -4,24 +4,26 @@ use puppet::program::Puppet;
 use puppet::{self, Data};
 
 
-declare_id!("4owkar2kmqCHRfdGxqGYEDoNt3A77JJg4sVJfX4QCLU9");
+declare_id!("5fkHyJJbdfQHUVQVxPhvKAeaHnEHgFxnYhNtJnYRqbJT");
 
 
 
 
 #[program]
+
 mod puppet_master {
     use super::*;
     pub fn pull_strings(ctx: Context<PullStrings>, bump: u8, data: u64) -> Result<()> {
         
         let bump = &[bump][..];
+        
         puppet::cpi::set_data(
             ctx.accounts.set_data_ctx().with_signer(&[&[bump][..]]),
-            data,
-        );
-        if data == 3 {
-            return Err(anchor_lang::error::ErrorCode::ConstraintClose.into());
-        };
+            data
+        ) ;
+        // if data == 3 {
+        //     return Err(anchor_lang::error::ErrorCode::ConstraintClose.into());
+        // };
             
         Ok(())
     }

@@ -64,8 +64,7 @@ const main = async () => {
   console.log("user or wallet : ", provider.wallet.publicKey.toBase58())
   console.log("***************************");
 
-  const [puppetMasterPDA, puppetMasterBump] =
-    await PublicKey.findProgramAddressSync([], puppetMasterProgram.programId);
+  const [puppetMasterPDA, puppetMasterBump] = PublicKey.findProgramAddressSync([], puppetMasterProgram.programId);
 
   console.log("****************************")
   console.log("PuppetMasterPDA : ", puppetMasterPDA.toBase58())

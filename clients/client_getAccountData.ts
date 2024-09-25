@@ -35,7 +35,7 @@ const main = async () => {
       const provider = new anchor.AnchorProvider(connection, wallet, {});
       anchor.setProvider(provider);
     
-      const puppetMasterProgram = new Program<PuppetMaster>(puppet_master_idl as PuppetMaster, provider);
+      // const puppetMasterProgram = new Program<PuppetMaster>(puppet_master_idl as PuppetMaster, provider);
       //------------------------------------------------------------------------------------------------
       const puppetProgram = new Program<Puppet>(puppet_idl as Puppet, provider);
       //------------------------------------------------------------------------------------------------
